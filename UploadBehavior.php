@@ -1,6 +1,6 @@
 <?php
 
-namespace mongosoft\file;
+namespace app\modules\admin\behaviors\FileUpload;
 
 use Closure;
 use Yii;
@@ -49,6 +49,12 @@ class UploadBehavior extends Behavior
      * @var string the attribute which holds the attachment.
      */
     public $attribute;
+    
+    /**
+     * @var string the attribute to force deletion of attachment
+     */
+    public $del_attribute;
+    
     /**
      * @var array the scenarios in which the behavior will be triggered
      */
@@ -155,16 +161,20 @@ class UploadBehavior extends Behavior
         /** @var BaseActiveRecord $model */
         $model = $this->owner;
         if (in_array($model->scenario, $this->scenarios)) {
-            if ($this->_file instanceof UploadedFile) {
-                if (!$model->getIsNewRecord() && $model->isAttributeChanged($this->attribute)) {
-                    if ($this->unlinkOnSave === true) {
-                        $this->delete($this->attribute, true);
-                    }
-                }
-                $model->setAttribute($this->attribute, $this->_file->name);
+            if($this->del_attribute && $model->{$this->del_attribute}) {
+                $this->delete($this->attribute, true);
             } else {
-                // Protect attribute
-                unset($model->{$this->attribute});
+                if ($this->_file instanceof UploadedFile) {
+                    if (!$model->getIsNewRecord() && $model->isAttributeChanged($this->attribute)) {
+                        if ($this->unlinkOnSave === true) {
+                            $this->delete($this->attribute, true);
+                        }
+                    }
+                    $model->setAttribute($this->attribute, $this->_file->name);
+                } else {
+                    // Protect attribute
+                    unset($model->{$this->attribute});
+                }
             }
         } else {
             if (!$model->getIsNewRecord() && $model->isAttributeChanged($this->attribute)) {
