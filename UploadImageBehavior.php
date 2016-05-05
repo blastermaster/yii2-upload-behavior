@@ -184,17 +184,20 @@ class UploadImageBehavior extends UploadBehavior
      */
     protected function getPlaceholderUrl($profile)
     {
-        list ($path, $url) = Yii::$app->assetManager->publish($this->placeholder);
-        $filename = basename($path);
-        $thumb = $this->getThumbFileName($filename, $profile);
-        $thumbPath = dirname($path) . DIRECTORY_SEPARATOR . $thumb;
-        $thumbUrl = dirname($url) . '/' . $thumb;
+        if(file_exists(Yii::getAlias($this->placeholder))) {
+            list ($path, $url) = Yii::$app->assetManager->publish($this->placeholder);
+            $filename = basename($path);
+            $thumb = $this->getThumbFileName($filename, $profile);
+            $thumbPath = dirname($path) . DIRECTORY_SEPARATOR . $thumb;
+            $thumbUrl = dirname($url) . '/' . $thumb;
 
-        if (!is_file($thumbPath)) {
-            $this->generateImageThumb($this->thumbs[$profile], $path, $thumbPath);
+            if (!is_file($thumbPath)) {
+                $this->generateImageThumb($this->thumbs[$profile], $path, $thumbPath);
+            }
+
+            return $thumbUrl;
         }
-
-        return $thumbUrl;
+        return false; 
     }
 
     /**
