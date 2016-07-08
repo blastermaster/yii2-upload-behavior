@@ -242,9 +242,9 @@ class UploadImageBehavior extends UploadBehavior
             $image = Image::getImagine()->open($path);
             $ratio = $image->getSize()->getWidth() / $image->getSize()->getHeight();
             if ($width) {
-                $height = ceil($width / $ratio);
+                $height = round($width / $ratio);
             } else {
-                $width = ceil($height * $ratio);
+                $width = round($height * $ratio);
             }
         }
 
